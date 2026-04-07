@@ -1,0 +1,20 @@
+services:
+
+  # Aegra Server
+  aegra:
+    build:
+      context: .
+      dockerfile: deployments/docker/Dockerfile
+    ports:
+      - "${PORT:-8000}:${PORT:-8000}"
+    env_file:
+      - .env
+    environment:
+      - PYTHONPATH=/app/src:/app/eerly_studio/src
+    volumes:
+      - ./aegra.json:/app/aegra.json:ro
+      - ./examples:/app/examples:ro
+      - ./libs/aegra-api/src:/app/src:ro # Mount full src for PYTHONPATH to work
+      - ./libs/aegra-api/alembic:/app/alembic:ro # for migrations
+      - ./eerly_studio:/app/eerly_studio:ro
+      - ./.env:/app/.env:ro

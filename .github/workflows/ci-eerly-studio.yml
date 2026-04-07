@@ -1,0 +1,38 @@
+name: CI - Eerly Studio
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - "eerly_studio/**"
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - "eerly_studio/**"
+
+jobs:
+  test-eerly-studio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+      
+      - name: Set up Python
+        run: uv python install 3.12
+      
+      - name: Install workspace dependencies
+        run: uv sync --all-packages
+      
+      # We need a postgres service for tests if we use PG specific features
+      # For now, tests use sqlite via conftest.py if not provided, 
+      # but let's add a postgres service just in case models depend on it
+      
+      - name: Run tests with pytest
+        env:
+          DATABASE_URL_AUTH_TEST: "sqlite+aiosqlite:///:memory:"
+        run: uv run --package eerly-studio pytest eerly_studio/tests

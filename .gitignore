@@ -1,0 +1,66 @@
+# [Insights Aegra] Root Gitignore
+
+# Documentation & Assets
+docs/images/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+!agent-chat-ui-main/public/
+!agent-chat-ui-main/src/components/icons/
+
+# Runtime Data & Logs
+*.log
+eerly_studio/artifacts/
+eerly_studio/storage/
+eerly_studio/temp_charts/
+eerly_studio/cognitive_map_cache/
+eerly_studio/cognitive_map_output/
+scripts/output.log
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+adventureworks_dump.sql
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.python-version
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.deepeval/
+
+# Node/Frontend
+node_modules/
+.next/
+out/
+.pnpm-debug.log
+agent-chat-ui-main/node_modules/
+agent-chat-ui-main/.next/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Configuration & Secrets
+.env
+.env.local
+.env.production
+.env.development
+aegra.manual_auth.json
+
+# IDEs
+.idea/
+.vscode/
+
+# MacOS
+.DS_Store

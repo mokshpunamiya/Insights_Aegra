@@ -1,0 +1,115 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: aegra
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: Set up Python 3.12
+        run: uv python install 3.12
+
+      - name: Install workspace dependencies
+        run: uv sync --all-packages
+
+      - name: Run aegra-api database migrations
+        working-directory: libs/aegra-api
+        env:
+          POSTGRES_USER: "user"
+          POSTGRES_PASSWORD: "password"
+          POSTGRES_HOST: "localhost"
+          POSTGRES_PORT: "5432"
+          POSTGRES_DB: "aegra"
+        run: uv run alembic upgrade head
+
+      - name: Run eerly_studio database migrations
+        working-directory: eerly_studio
+        env:
+          DATABASE_URL_AUTH: "postgresql+asyncpg://user:password@localhost:5432/aegra"
+          DATABASE_URL: "postgresql+asyncpg://user:password@localhost:5432/aegra"
+        run: uv run alembic upgrade head
+
+      - name: Start Aegra server in background
+        env:
+          AEGRA_CONFIG: ${{ github.workspace }}/aegra.json
+          POSTGRES_USER: "user"
+          POSTGRES_PASSWORD: "password"
+          POSTGRES_HOST: "localhost"
+          POSTGRES_PORT: "5432"
+          POSTGRES_DB: "aegra"
+          DATABASE_URL_AUTH: "postgresql+asyncpg://user:password@localhost:5432/aegra"
+          DATABASE_URL: "postgresql+asyncpg://user:password@localhost:5432/aegra"
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          AUTH_TYPE: noop
+          HOST: "0.0.0.0"
+          PORT: "8000"
+          # Add examples and eerly_studio to Python path
+          PYTHONPATH: ${{ github.workspace }}/examples:${{ github.workspace }}/eerly_studio/src
+        working-directory: libs/aegra-api
+        run: |
+          uv run uvicorn aegra_api.main:app --host 0.0.0.0 --port 8000 > server.log 2>&1 &
+          echo $! > server.pid
+          echo "Waiting for server to be ready..."
+          for i in {1..30}; do
+            if curl -s http://localhost:8000/health > /dev/null 2>&1; then
+              echo "Server is ready!"
+              exit 0
+            fi
+            echo "Attempt $i/30: Server not ready yet..."
+            sleep 2
+          done
+          echo "Server failed to start. Logs:"
+          cat server.log
+          exit 1
+
+      - name: Run E2E tests
+        working-directory: libs/aegra-api
+        env:
+          SERVER_URL: http://localhost:8000
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          PYTHONPATH: ${{ github.workspace }}/eerly_studio/src
+        run: uv run pytest tests/e2e -v --tb=short --ignore=tests/e2e/manual_auth_tests
+
+      - name: Show server logs on failure
+        if: failure()
+        working-directory: libs/aegra-api
+        run: |
+          echo "=== Server Logs ==="
+          cat server.log || echo "No server logs found"
+
+      - name: Stop server
+        if: always()
+        working-directory: libs/aegra-api
+        run: |
+          if [ -f server.pid ]; then
+            kill $(cat server.pid) || true
+          fi

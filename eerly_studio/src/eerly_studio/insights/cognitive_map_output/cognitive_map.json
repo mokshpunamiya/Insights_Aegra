@@ -1,0 +1,189 @@
+{
+  "table_knowledge": {
+    "crm_lead": {
+      "schema_description": "Contains general-purpose tables accessible across the organization.",
+      "schema": "public",
+      "table_name": "crm_lead",
+      "table_description": "Tracks potential sales opportunities (leads) including customer details, sales team assignments, and revenue projections. This table appears to be part of a CRM system, capturing lead information from initial contact through to potential closure or loss.",
+      "use_cases": [
+        "Analyzing sales pipeline by region, salesperson, or product",
+        "Tracking lead conversion rates and revenue projections",
+        "Identifying high-priority leads for sales teams",
+        "Monitoring campaign effectiveness through lead sources"
+      ],
+      "data_quality_notes": [
+        "The 'created_on' field is stored as TEXT rather than a proper timestamp/datetime type",
+        "Several numeric fields are stored as TEXT (expected_revenue) or DOUBLE PRECISION (my_activity_deadline, probability) which may require type conversion for calculations",
+        "Many fields are nullable which may impact join operations or data completeness",
+        "Country and state fields appear to have inconsistent formatting in sample data"
+      ],
+      "table_columns": [
+        {
+          "name": "created_on",
+          "type": "TEXT",
+          "description": "Timestamp of lead creation stored as text (format appears to be YYYY-MM-DD HH:MM:SS)"
+        },
+        {
+          "name": "opportunity",
+          "type": "TEXT",
+          "description": "Description of the sales opportunity or potential deal"
+        },
+        {
+          "name": "customer",
+          "type": "TEXT",
+          "description": "Customer name and potentially additional contact information"
+        },
+        {
+          "name": "contact_name",
+          "type": "TEXT",
+          "description": "Primary contact person for this lead"
+        },
+        {
+          "name": "email",
+          "type": "TEXT",
+          "description": "Email address of the contact person"
+        },
+        {
+          "name": "phone",
+          "type": "TEXT",
+          "description": "Phone number of the contact person (may be null)"
+        },
+        {
+          "name": "city",
+          "type": "TEXT",
+          "description": "City where the customer is located"
+        },
+        {
+          "name": "state",
+          "type": "TEXT",
+          "description": "State or region where the customer is located (format varies)"
+        },
+        {
+          "name": "country",
+          "type": "TEXT",
+          "description": "Country where the customer is located"
+        },
+        {
+          "name": "salesperson",
+          "type": "TEXT",
+          "description": "Name of the salesperson assigned to this lead"
+        },
+        {
+          "name": "sales_team",
+          "type": "TEXT",
+          "description": "Sales team responsible for this lead"
+        },
+        {
+          "name": "priority",
+          "type": "TEXT",
+          "description": "Priority level of the lead (e.g., 'Very High')"
+        },
+        {
+          "name": "activities",
+          "type": "TEXT",
+          "description": "Record of activities related to this lead (may be null)"
+        },
+        {
+          "name": "responsible_user",
+          "type": "TEXT",
+          "description": "User currently responsible for this lead"
+        },
+        {
+          "name": "my_activity_deadline",
+          "type": "DOUBLE PRECISION",
+          "description": "Deadline for next activity stored as a numeric value (unclear what this represents - may need conversion)"
+        },
+        {
+          "name": "campaign",
+          "type": "TEXT",
+          "description": "Marketing campaign associated with this lead (may be null)"
+        },
+        {
+          "name": "medium",
+          "type": "TEXT",
+          "description": "Medium through which the lead was acquired"
+        },
+        {
+          "name": "source",
+          "type": "TEXT",
+          "description": "Source of the lead"
+        },
+        {
+          "name": "expected_revenue",
+          "type": "TEXT",
+          "description": "Expected revenue from this lead stored as text (may contain commas and decimal points)"
+        },
+        {
+          "name": "expected_closing",
+          "type": "TEXT",
+          "description": "Expected closing date for this opportunity (format unclear)"
+        },
+        {
+          "name": "stage",
+          "type": "TEXT",
+          "description": "Current stage in the sales pipeline"
+        },
+        {
+          "name": "probability",
+          "type": "DOUBLE PRECISION",
+          "description": "Probability of closing this deal (stored as a numeric value between 0-100)"
+        },
+        {
+          "name": "lost_reason",
+          "type": "TEXT",
+          "description": "Reason why the lead was lost (if applicable)"
+        },
+        {
+          "name": "tags",
+          "type": "TEXT",
+          "description": "Tags associated with this lead"
+        },
+        {
+          "name": "properties",
+          "type": "DOUBLE PRECISION",
+          "description": "Unclear what this numeric value represents (may need investigation)"
+        }
+      ]
+    }
+  },
+  "business_knowledge": {
+    "metrics": [
+      {
+        "name": "Lead Conversion Probability",
+        "definition": "The probability of converting a lead into a customer, expressed as a percentage.",
+        "table": "crm_lead",
+        "calculation": "SELECT AVG(probability) FROM crm_lead"
+      },
+      {
+        "name": "Expected Revenue from Leads",
+        "definition": "The total expected revenue from all leads, calculated by summing the expected revenue for each lead.",
+        "table": "crm_lead",
+        "calculation": "SELECT SUM(CAST(REPLACE(expected_revenue, ',', '') AS DOUBLE PRECISION)) FROM crm_lead"
+      }
+    ],
+    "business_rules": [
+      "The 'probability' field in the crm_lead table represents the likelihood of converting a lead into a customer, ranging from 0 to 100.",
+      "The 'expected_revenue' field in the crm_lead table is stored as TEXT and may contain commas, requiring conversion to a numeric type for calculations."
+    ],
+    "common_gotchas": [
+      {
+        "issue": "Commas in expected_revenue",
+        "tables_affected": [
+          "crm_lead"
+        ],
+        "solution": "Use REPLACE(expected_revenue, ',', '') to remove commas before casting to a numeric type."
+      }
+    ],
+    "_table_names": [
+      "crm_lead"
+    ]
+  },
+  "_build_meta": {
+    "strategy": "parallel+chunked",
+    "tables_total": 1,
+    "tables_cached": 0,
+    "tables_processed": 1,
+    "elapsed_seconds": 9.8,
+    "cache_dir": "C:\\Users\\moksh.punamiya\\insights_aegra\\eerly_studio\\src\\eerly_studio\\insights\\cognitive_map_output\\cognitive_map_cache"
+  }
+}

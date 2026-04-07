@@ -1,0 +1,13 @@
+{
+  "dependencies": [],
+  "graphs": {
+    "insights": "./eerly_studio/src/eerly_studio/insights/graph.py:graph"
+  },
+  "auth": {
+    "path": "eerly_studio.my_auth:auth"
+  },
+  "http": {
+    "app": "eerly_studio.main:app",
+    "enable_custom_route_auth": false
+  }
+}
