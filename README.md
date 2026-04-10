@@ -1,11 +1,11 @@
 # 🔍 Insights Aegra: Multi-Agent Data Intelligence Platform
 
-[![Backend: Aegra](https://img.shields.io/badge/Backend-Aegra-indigo.svg)](https://github.com/accely-eerly-ai/insights_aegra)
+[![Backend: Aegra](https://img.shields.io/badge/Backend-Aegra-indigo.svg)](https://github.com/mokshpunamiya/Insights_Aegra)
 [![Frontend: Next.js 15+](https://img.shields.io/badge/Frontend-Next.js%2015-blue.svg)](https://nextjs.org/)
 [![Database: PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-blue.svg)](https://www.postgresql.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Insights Aegra is a **production-ready Multi-Agent Data Intelligence system** built on the [Aegra Framework](https://github.com/accely-eerly-ai/insights_aegra). It enables high-accuracy data analysis through a sophisticated autonomous multi-agent graph, combining RAG-driven SQL generation with sandboxed Python code execution.
+Insights Aegra is a **production-ready Multi-Agent Data Intelligence system** built on the [Aegra Framework](https://github.com/mokshpunamiya/Insights_Aegra). It enables high-accuracy data analysis through a sophisticated autonomous multi-agent graph, combining RAG-driven SQL generation with sandboxed Python code execution.
 
 ---
 
@@ -86,7 +86,7 @@ graph TD
 
 ### 1. Repository Setup
 ```bash
-git clone https://github.com/accely-eerly-ai/insights_aegra.git
+git clone https://github.com/mokshpunamiya/Insights_Aegra.git
 cd insights_aegra
 uv sync --all-packages
 ```
